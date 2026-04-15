@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Bank</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+    }
+
+    .header {
+      background: #005baa;
+      color: white;
+      padding: 20px;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+
+    .header h2 {
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      margin: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .saldo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #005baa;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #005baa;
+      color: white;
+      cursor: pointer;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    .logout {
+      background: red;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>BRI Mobile</h2>
+  <p id="user"></p>
+</div>
+
+<div class="card">
+  <p>Saldo Anda</p>
+  <div class="saldo">Rp <span id="saldo">0</span></div>
+</div>
+
+<div class="card">
+  <h3>Tambah Saldo</h3>
+  <input type="number" id="tambah" placeholder="Masukkan jumlah">
+  <button onclick="tambahSaldo()">Tambah</button>
+</div>
+
+<div class="card">
+  <h3>Kirim Uang</h3>
+  <input type="text" id="tujuan" placeholder="Nama tujuan">
+  <input type="number" id="kirim" placeholder="Jumlah">
+  <button onclick="kirimUang()">Kirim</button>
+</div>
+
+<div class="card">
+  <h3>Riwayat Transaksi</h3>
+  <ul id="riwayat"></ul>
+</div>
+
+<div class="card">
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<script>
+  const user = localStorage.getItem("loginUser");
+
+  if (!user) {
+    window.location.href = "index.html";
+  }
+
+  document.getElementById("user").innerText = "Halo, " + user;
+
+  let saldo = parseInt(localStorage.getItem("saldo") || 0);
+  let riwayat = JSON.parse(localStorage.getItem("riwayat") || "[]");
+
+  function render() {
+    document.getElementById("saldo").innerText = saldo;
+
+    const list = document.getElementById("riwayat");
+    list.innerHTML = "";
+
+    riwayat.forEach(item => {
+      const li = document.createElement("li");
+      li.innerText = item;
+      list.appendChild(li);
+    });
+  }
+
+  function tambahSaldo() {
+    const jumlah = parseInt(document.getElementById("tambah").value);
+
+    if (!jumlah || jumlah <= 0) {
+      alert("Masukkan jumlah yang benar");
+      return;
+    }
+
+    saldo += jumlah;
+    riwayat.push("+ Rp " + jumlah);
+
+    simpan();
+  }
+
+  function kirimUang() {
+    const tujuan = document.getElementById("tujuan").value;
+    const jumlah = parseInt(document.getElementById("kirim").value);
+
+    if (!tujuan || !jumlah) {
+      alert("Isi semua data");
+      return;
+    }
+
+    if (jumlah > saldo) {
+      alert("Saldo tidak cukup");
+      return;
+    }
+
+    saldo -= jumlah;
+    riwayat.push("Transfer ke " + tujuan + " - Rp " + jumlah);
+
+    simpan();
+  }
+
+  function simpan() {
+    localStorage.setItem("saldo", saldo);
+    localStorage.setItem("riwayat", JSON.stringify(riwayat));
+    render();
+  }
+
+  function logout() {
+    localStorage.removeItem("loginUser");
+    window.location.href = "index.html";
+  }
+
+  render();
+</script>
+
+</body>
+</html>

